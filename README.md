@@ -183,7 +183,7 @@ The old inputs remain in `variables.deprecated.tf`. A non-null replacement takes
 
 The Monday 06:23 UTC/manual workflow regenerates modern runtime data and proposes changes for review. It never updates the frozen legacy renderer or automatically merges changes. An open update is left untouched until merged or closed.
 
-Manual additions, property overrides, and public-key assignments persist across regeneration, including when an entry becomes documented. Removed generated entries are retained beneath any existing manual patch so omitted properties are not lost.
+Manual additions, reviewed overrides, and public-key assignments persist across regeneration. Historical-slug fallbacks that exist only because no CAF abbreviation was documented are retired when a recommendation appears; `legacy_mode` retains the original names. Removed generated entries are retained beneath any existing manual patch so omitted properties are not lost.
 
 Repository settings must permit GitHub Actions to create pull requests. Requests created with `GITHUB_TOKEN` do not automatically trigger other workflows; validation runs before publication.
 

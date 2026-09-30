@@ -3237,12 +3237,6 @@
       "override_reason": "Use the original slug where the selected sources have no unambiguous CAF abbreviation.",
       "override_source": "https://github.com/Azure/terraform-azurerm-naming/blob/fc289126c9c888393ff02a79e1babadd6865861c/main.tf"
     },
-    "namespace_eventhub_consumergroup": {
-      "slug": "ehcg",
-      "slug_source": "manual",
-      "override_reason": "Use the original slug where the selected sources have no unambiguous CAF abbreviation.",
-      "override_source": "https://github.com/Azure/terraform-azurerm-naming/blob/fc289126c9c888393ff02a79e1babadd6865861c/main.tf"
-    },
     "namespace_hybrid_connection": {
       "slug": "rlhc",
       "slug_source": "manual",
