@@ -15849,10 +15849,10 @@
       }
     },
     "namespace_eventhub_consumergroup": {
-      "resource_type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
+      "resource_type": "Microsoft.EventHub/namespaces/eventhubs/consumerGroups",
       "variant": null,
-      "slug": "namespace-eventhub-consumergroup",
-      "slug_source": "derived",
+      "slug": "evhcg",
+      "slug_source": "caf",
       "legacy_slug": "ehcg",
       "legacy_outputs": [
         "eventhub_consumer_group"
@@ -15891,7 +15891,17 @@
         },
         "section_notes": [],
         "abbreviations_url": "https://raw.githubusercontent.com/MicrosoftDocs/cloud-adoption-framework/main/docs/ready/azure-best-practices/resource-abbreviations.md",
-        "abbreviations": []
+        "abbreviations": [
+          {
+            "resource_type": "Microsoft.EventHub/namespaces/eventhubs/consumerGroups",
+            "label": "Event hub consumer group",
+            "qualifier": null,
+            "qualifier_value": null,
+            "resource_provider_namespace_text": "`Microsoft.EventHub/namespaces/eventhubs/consumerGroups`",
+            "abbreviation": "evhcg",
+            "abbreviation_text": "`evhcg`"
+          }
+        ]
       }
     },
     "namespace_hybrid_connection": {

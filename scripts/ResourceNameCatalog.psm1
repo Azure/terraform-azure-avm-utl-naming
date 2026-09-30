@@ -648,9 +648,20 @@ function ConvertTo-ResourceNameCatalog {
         }
     }
     foreach ($key in $Manual.resources.Keys) {
+        $manualRecord = $Manual.resources[$key]
+        if ($generated.resources.Contains($key) -and
+            $generated.resources[$key].slug_source -ceq 'caf' -and
+            $manualRecord.Count -eq 4 -and
+            $manualRecord.Contains('slug') -and $manualRecord.slug -ceq $generated.resources[$key].legacy_slug -and
+            $manualRecord.Contains('slug_source') -and $manualRecord.slug_source -ceq 'manual' -and
+            $manualRecord.Contains('override_reason') -and
+            $manualRecord.override_reason -ceq 'Use the original slug where the selected sources have no unambiguous CAF abbreviation.' -and
+            $manualRecord.Contains('override_source')) {
+            continue
+        }
         if (-not $manualRecords.Contains($key)) { $manualRecords[$key] = [ordered]@{} }
-        foreach ($field in $Manual.resources[$key].Keys) {
-            $manualRecords[$key][$field] = $Manual.resources[$key][$field]
+        foreach ($field in $manualRecord.Keys) {
+            $manualRecords[$key][$field] = $manualRecord[$field]
         }
     }
     foreach ($key in (Get-NamingRulesSortedKey $manualRecords)) {

@@ -444,6 +444,35 @@ Test-Case 'manual resources patch individual properties without changing generat
     Assert-True ((ConvertTo-NamingCatalogJson $updated.Manual) -ceq (ConvertTo-NamingCatalogJson $result.Manual)) 'Regeneration rewrote the manual patch.'
 }
 
+Test-Case 'documented abbreviations retire only obsolete legacy fallback patches' {
+    $manual = $script:Manual | ConvertTo-Json -Depth 20 | ConvertFrom-Json -AsHashtable
+    $manual.legacy_mappings.foo_server = @{ resource_type = 'Microsoft.Foo/servers'; variant = $null; slug = 'old' }
+    $manual.resources.foo_server = @{
+        slug = 'old'
+        slug_source = 'manual'
+        override_reason = 'Use the original slug where the selected sources have no unambiguous CAF abbreviation.'
+        override_source = 'https://github.com/Azure/terraform-azurerm-naming/blob/fc289126c9c888393ff02a79e1babadd6865861c/main.tf'
+    }
+    $initial = ConvertTo-ResourceNameCatalog -RulesMarkdown $script:Rules -AbbreviationsMarkdown $script:Abbreviations -Manual $manual
+    $abbreviations = $script:Abbreviations.Replace('## Next step', @'
+| Foo server | `Microsoft.Foo/servers` | `foo` |
+
+## Next step
+'@)
+    $updated = ConvertTo-ResourceNameCatalog -RulesMarkdown $script:Rules -AbbreviationsMarkdown $abbreviations -Manual $initial.Manual -Previous $initial.Generated
+    $effective = Merge-NamingCatalog -Catalogs @($updated.Generated, $updated.Manual)
+    Assert-True ($initial.Generated.resources.foo_server.slug_source -ceq 'derived' -and $initial.Manual.resources.foo_server.slug -ceq 'old') 'The fixture did not start with a legacy fallback.'
+    Assert-True ($updated.Generated.resources.foo_server.slug_source -ceq 'caf' -and $effective.resources.foo_server.slug -ceq 'foo' -and -not $updated.Manual.resources.Contains('foo_server')) 'The new CAF recommendation did not replace the obsolete fallback.'
+    Assert-True ($updated.Generated.resources.foo_server.legacy_slug -ceq 'old' -and $updated.Manual.key_assignments.foo_server -ceq $initial.Manual.key_assignments.foo_server) 'Retiring the fallback changed the legacy alias or catalog key.'
+
+    $reviewed = $initial.Manual | ConvertTo-Json -Depth 40 | ConvertFrom-Json -AsHashtable
+    $reviewed.resources.foo_server.slug = 'curated'
+    $reviewed.resources.foo_server.override_reason = 'Reviewed manual abbreviation.'
+    $retained = ConvertTo-ResourceNameCatalog -RulesMarkdown $script:Rules -AbbreviationsMarkdown $abbreviations -Manual $reviewed -Previous $initial.Generated
+    Assert-True ($retained.Manual.resources.foo_server.slug -ceq 'curated' -and
+        (Merge-NamingCatalog -Catalogs @($retained.Generated, $retained.Manual)).resources.foo_server.slug -ceq 'curated') 'A reviewed manual override was removed with the obsolete fallbacks.'
+}
+
 Test-Case 'later layers win while omitted entries and properties survive' {
     $catalog = Get-TestCatalog
     $manual = @{ schema_version = 2; resources = @{ storage_account = @{ slug = 'manual'; max_length = 20; forbidden_sequences = @('--') } } }
