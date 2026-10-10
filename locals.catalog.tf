@@ -83,7 +83,7 @@ locals {
       ]) &&
       alltrue([
         for field in ["dashes", "lowercase", "validation_complete"] :
-        contains([true, false], definition[field])
+        definition[field] != null && contains([true, false], definition[field])
       ]) &&
       alltrue([
         for field in ["legacy_outputs", "validation_notes", "forbidden_prefixes", "forbidden_suffixes", "forbidden_sequences", "reserved_names"] :
