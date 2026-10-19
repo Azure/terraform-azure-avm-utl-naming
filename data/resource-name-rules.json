@@ -12990,6 +12990,47 @@
         "abbreviations": []
       }
     },
+    "insights_private_link_scope": {
+      "resource_type": "Microsoft.Insights/privateLinkScopes",
+      "variant": null,
+      "slug": "ampls",
+      "slug_source": "caf",
+      "legacy_slug": null,
+      "legacy_outputs": [],
+      "min_length": null,
+      "max_length": null,
+      "scope": null,
+      "regex": null,
+      "dashes": false,
+      "lowercase": true,
+      "name_kind": "standard",
+      "fixed_name": null,
+      "validation_complete": false,
+      "validation_notes": [
+        "No naming-rule row exists in the selected naming-rules document; generation uses conservative lowercase, separator-free components."
+      ],
+      "forbidden_prefixes": [],
+      "forbidden_suffixes": [],
+      "forbidden_sequences": [],
+      "reserved_names": [],
+      "source": {
+        "naming_rules_url": "https://raw.githubusercontent.com/MicrosoftDocs/azure-docs/main/articles/azure-resource-manager/management/resource-name-rules.md",
+        "naming_rule": null,
+        "section_notes": [],
+        "abbreviations_url": "https://raw.githubusercontent.com/MicrosoftDocs/cloud-adoption-framework/main/docs/ready/azure-best-practices/resource-abbreviations.md",
+        "abbreviations": [
+          {
+            "resource_type": "Microsoft.Insights/privateLinkScopes",
+            "label": "Azure Monitor Private Link Scope",
+            "qualifier": null,
+            "qualifier_value": null,
+            "resource_provider_namespace_text": "`Microsoft.Insights/privateLinkScopes`",
+            "abbreviation": "ampls",
+            "abbreviation_text": "`ampls`"
+          }
+        ]
+      }
+    },
     "integration_account": {
       "resource_type": "Microsoft.Logic/integrationAccounts",
       "variant": null,
