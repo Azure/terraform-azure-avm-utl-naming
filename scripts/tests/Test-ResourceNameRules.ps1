@@ -77,6 +77,35 @@ $script:Abbreviations = @'
 [Tags](./resource-tagging.md)
 '@
 $script:Rules = Get-RulesDocument
+$publicationContext = @{
+    GitHubActions = 'true'
+    EventName = 'schedule'
+    SourceRepository = 'Azure/azure-verified-modules-tools'
+    SourceRef = 'refs/heads/main'
+    WorkflowRef = 'Azure/azure-verified-modules-tools/.github/workflows/repository-management-resource-name-rules-sync.yml@refs/heads/main'
+    BaseBranch = 'main'
+    Token = 'test'
+}
+
+Test-Case 'publication accepts only trusted scheduled or manual contexts' {
+    Assert-True (Test-ResourceNameRulesPublicationContext @publicationContext) 'The tools workflow was rejected.'
+    $direct = $publicationContext.Clone()
+    $direct.SourceRepository = 'Azure/terraform-azure-avm-utl-naming'
+    $direct.WorkflowRef = ''
+    $direct.EventName = 'workflow_dispatch'
+    Assert-True (Test-ResourceNameRulesPublicationContext @direct) 'The upstream default-branch workflow was rejected.'
+    foreach ($case in @(
+        @{ GitHubActions = 'false' }, @{ EventName = 'pull_request' }, @{ SourceRepository = 'someone/fork' },
+        @{ SourceRef = 'refs/heads/feature' }, @{ WorkflowRef = 'untrusted' }, @{ BaseBranch = '' }, @{ Token = '' }
+    )) {
+        $invalid = $publicationContext.Clone()
+        foreach ($key in $case.Keys) { $invalid[$key] = $case[$key] }
+        Assert-True (-not (Test-ResourceNameRulesPublicationContext @invalid)) "Rejected context was accepted: $($case.Keys -join ', ')."
+    }
+    $direct.SourceRef = 'refs/heads/feature'
+    Assert-True (-not (Test-ResourceNameRulesPublicationContext @direct)) 'A non-default upstream branch was accepted.'
+}
+
 $script:Manual = [ordered]@{
     schema_version = 2
     legacy_mappings = [ordered]@{
