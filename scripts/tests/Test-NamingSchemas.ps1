@@ -9,6 +9,10 @@ $root = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 $overlaySchema = Join-Path $root 'schemas\naming-overrides.schema.json'
 $catalogSchema = Join-Path $root 'schemas\naming-catalog.schema.json'
 $script:Passed = 0
+$schemaOptions = @{}
+if ((Get-Command Test-Json).Parameters.ContainsKey('FetchExternalReference')) {
+    $schemaOptions.FetchExternalReference = $true
+}
 
 function Test-SchemaCase {
     param(
@@ -19,7 +23,7 @@ function Test-SchemaCase {
     )
 
     $schemaErrors = @()
-    $actual = Test-Json -Json $Json -SchemaFile $Schema -ErrorAction SilentlyContinue -ErrorVariable schemaErrors
+    $actual = Test-Json -Json $Json -SchemaFile $Schema @schemaOptions -ErrorAction SilentlyContinue -ErrorVariable schemaErrors
     if ($actual -ne $Expected) {
         throw "Schema case '$Name' expected $Expected, got '$actual': $($schemaErrors -join '; ')"
     }

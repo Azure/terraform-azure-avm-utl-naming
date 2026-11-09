@@ -5,6 +5,28 @@ $ErrorActionPreference = 'Stop'
 Import-Module (Join-Path $PSScriptRoot 'ResourceNameRules.psm1')
 Import-Module (Join-Path $PSScriptRoot 'ResourceNameCatalog.psm1')
 
+function Test-ResourceNameRulesPublicationContext {
+    param(
+        [string] $GitHubActions,
+        [string] $EventName,
+        [string] $SourceRepository,
+        [string] $SourceRef,
+        [string] $WorkflowRef,
+        [string] $BaseBranch,
+        [string] $Token
+    )
+
+    if ($GitHubActions -cne 'true' -or $EventName -notin @('schedule', 'workflow_dispatch') -or
+        [string]::IsNullOrWhiteSpace($BaseBranch) -or [string]::IsNullOrWhiteSpace($Token)) {
+        return $false
+    }
+    return (
+        ($SourceRepository -ceq 'Azure/terraform-azure-avm-utl-naming' -and $SourceRef -ceq "refs/heads/$BaseBranch") -or
+        ($SourceRepository -ceq 'Azure/azure-verified-modules-tools' -and $SourceRef -ceq 'refs/heads/main' -and
+            $WorkflowRef -ceq 'Azure/azure-verified-modules-tools/.github/workflows/repository-management-resource-name-rules-sync.yml@refs/heads/main')
+    )
+}
+
 function Invoke-ResourceNameRulesNativeCommand {
     [CmdletBinding()]
     param(
@@ -95,13 +117,7 @@ function Publish-ResourceNameRulesUpdate {
             while ($Arguments[$operationIndex] -eq '-c') {
                 $operationIndex += 2
             }
-            $permissionHint = ''
-            if ($FileName -eq 'gh' -and
-                (($Arguments[0] -eq 'pr' -and $Arguments[1] -eq 'create') -or
-                ($Arguments[0] -eq 'api' -and $Arguments -contains 'PATCH'))) {
-                $permissionHint = ' For PR-write failures, verify GITHUB_TOKEN permissions and the repository prerequisite: Settings > Actions > General > Workflow permissions > Allow GitHub Actions to create and approve pull requests. This workflow does not verify or change that setting; its enabled state must not be assumed.'
-            }
-            throw "$FileName command failed during $($Arguments[$operationIndex]); publication was not completed (exit code $($result.ExitCode)).$permissionHint"
+            throw "$FileName command failed during $($Arguments[$operationIndex]); publication was not completed (exit code $($result.ExitCode))."
         }
         return $result
     }
@@ -214,9 +230,7 @@ Sources: [Azure naming rules](https://github.com/MicrosoftDocs/azure-docs/blob/m
 
 ### Automation notes
 
-The workflow runs parser/publication tests and native Terraform unit tests before publishing. `GITHUB_TOKEN`-created pull requests do not automatically trigger other event-based workflows.
-
-Repository prerequisite: **Settings > Actions > General > Workflow permissions > Allow GitHub Actions to create and approve pull requests** must be enabled by a maintainer. The workflow does not change that setting or approve pull requests.
+The tools workflow runs parser/publication tests and native Terraform unit tests before publishing with the AVM GitHub App. The resulting pull request triggers the normal repository checks.
 '@
     $pullRequestsResult = & $run 'gh' @(
         'api', '--method', 'GET', "repos/$Repository/pulls",
@@ -256,4 +270,4 @@ Repository prerequisite: **Settings > Actions > General > Workflow permissions >
     return [pscustomobject] @{ Status = 'proposed'; Changed = $true; Pushed = $true; PullRequestUrl = $pullRequestUrl }
 }
 
-Export-ModuleMember -Function Invoke-ResourceNameRulesNativeCommand, Publish-ResourceNameRulesUpdate
+Export-ModuleMember -Function Test-ResourceNameRulesPublicationContext, Invoke-ResourceNameRulesNativeCommand, Publish-ResourceNameRulesUpdate
