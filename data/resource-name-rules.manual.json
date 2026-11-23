@@ -3261,12 +3261,6 @@
       "override_reason": "Reviewed modern authorization-rule abbreviation replacing the unrelated DNS-record slug.",
       "override_source": "https://github.com/Azure/terraform-azurerm-naming/issues/206"
     },
-    "namespace_topic_subscription_rule": {
-      "slug": "sbsr",
-      "slug_source": "manual",
-      "override_reason": "Use the original slug where the selected sources have no unambiguous CAF abbreviation.",
-      "override_source": "https://github.com/Azure/terraform-azurerm-naming/blob/fc289126c9c888393ff02a79e1babadd6865861c/main.tf"
-    },
     "nat_gateway": {
       "max_length": 80,
       "override_reason": "Conservative maximum retained from the original naming entries while the selected documentation does not establish a universal maximum: nat_gateway",
@@ -4453,6 +4447,7 @@
     "import_export_job": "microsoft.importexport/jobs|",
     "information_protection_policy": "microsoft.security/informationprotectionpolicies|",
     "ingestion_setting": "microsoft.security/ingestionsettings|",
+    "insights_private_link_scope": "microsoft.insights/privatelinkscopes|",
     "integration_account": "microsoft.logic/integrationaccounts|",
     "integration_account_assembly": "microsoft.logic/integrationaccounts/assemblies|",
     "integration_account_batch_configuration": "microsoft.logic/integrationaccounts/batchconfigurations|",
